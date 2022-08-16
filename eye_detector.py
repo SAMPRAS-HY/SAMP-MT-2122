@@ -64,7 +64,7 @@ class Eye_Close_Detector():
             mesh_coords = landmarksDetection(frame,results)
             ratio = blinkRatio(mesh_coords, RIGHT_EYE, LEFT_EYE)
             utils.colorBackgroundText(frame,  f'Ratio : {round(ratio,2)}', FONTS, 0.7, (30,100),2, utils.PINK, utils.YELLOW)
-            if ratio >= 3.2:
+            if ratio >= 3.8:
                 self.COUNTER += 1
                 utils.colorBackgroundText(frame,  'Eye closed', FONTS, 1.7, (int(frame_height/2), 100), 2, utils.YELLOW, pad_x=6, pad_y=6, )
                 print("Counter=",self.COUNTER)

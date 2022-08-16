@@ -9,14 +9,14 @@ mp_face_mesh = mp.solutions.face_mesh
 
 
 def findDistance(a, b):
-    return a-b
+    return m.sqrt((a-b)**2)
 
 
 def passDistance(a):
-    lear_x = m.sqrt(findDistance(a[0], l_pixelCoordinatesLandmark[0])**2)
-    rear_x = m.sqrt(findDistance(a[0], r_pixelCoordinatesLandmark[0])**2)
-    lear_y = m.sqrt(findDistance(a[1], l_pixelCoordinatesLandmark[1])**2)
-    rear_y = m.sqrt(findDistance(a[1], r_pixelCoordinatesLandmark[1])**2)
+    lear_x = findDistance(a[0], l_pixelCoordinatesLandmark[0])
+    rear_x = findDistance(a[0], r_pixelCoordinatesLandmark[0])
+    lear_y = findDistance(a[1], l_pixelCoordinatesLandmark[1])
+    rear_y = findDistance(a[1], r_pixelCoordinatesLandmark[1])
     dis_x = min(lear_x, rear_x)
     dis_y = min(lear_y, rear_y)
     print('lear: %f, rear: %f' % (lear_x, rear_x))
