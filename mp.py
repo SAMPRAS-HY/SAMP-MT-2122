@@ -70,3 +70,11 @@ class MP():
                     mp_drawing_styles.get_default_hand_connections_style())
         return image
     
+v=cv2.VideoCapture(0)
+ll = MP()
+while True:
+    ret, frame= v.read()
+    frame = ll(frame)
+    cv2.imshow('frame', frame)
+    cv2.waitKey(2)
+cv2.destroyAllWindows()
