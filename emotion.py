@@ -20,8 +20,8 @@ emotions = {
 }
 num_classes = len(emotions)
 input_shape = (48, 48, 1)
-weights_1 = '/Users/Yin/FYP/samp-mt-2122/saved_models/vggnet.h5'
-weights_2 = '/Users/Yin/FYP/samp-mt-2122/saved_models/vggnet_up.h5'
+weights_1 = 'saved_models/vggnet.h5'
+weights_2 = 'saved_models/vggnet_up.h5'
 
 class VGGNet(Sequential):
     def __init__(self, input_shape, num_classes, checkpoint_path, lr=1e-3):

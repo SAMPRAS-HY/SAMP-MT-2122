@@ -10,6 +10,7 @@ mp_hands = mp.solutions.hands
 mp_face_detection = mp.solutions.face_detection
 drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
 eye = Eye_Close_Detector()
+
 class MP():
     def __init__(self):
         self.pose = mp_pose.Pose(min_detection_confidence=0.5,min_tracking_confidence=0.5)
@@ -73,6 +74,7 @@ class MP():
                     mp_drawing_styles.get_default_hand_connections_style())
         return image
     
+    # check the camera is covered
     def __sharpness(self, img):
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         lap = cv2.Laplacian(img, cv2.CV_16S)

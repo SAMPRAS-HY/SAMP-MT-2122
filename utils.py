@@ -23,12 +23,12 @@ def argsparser():
     parser.add_argument(
         "--model_dir",
         type=str,
-        default="/home/sampras/Paddle_deploy/yolov3_mobilenet_v3",
+        default="yolov3_mobilenet_v3",
         help=("Directory include:'model.pdiparams', 'model.pdmodel', "
               "'infer_cfg.yml', created by tools/export_model.py."),
         required=False)
     parser.add_argument(
-        "--image_file", type=str, default="/home/sampras/Paddle_deploy/img_2_339.jpg", help="Path of image file.")
+        "--image_file", type=str, default="img_2_339.jpg", help="Path of image file.")
     parser.add_argument(
         "--image_dir",
         type=str,
@@ -39,7 +39,7 @@ def argsparser():
     parser.add_argument(
         "--video_file",
         type=str,
-        default="/home/sampras/Paddle_deploy/test.mp4",
+        default="test.mp4",
         help="Path of video file, `video_file` or `camera_id` has a highest priority."
     )
     parser.add_argument(
