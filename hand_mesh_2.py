@@ -1,6 +1,6 @@
 import cv2
 import mediapipe as mp
-import math as m
+from math import sqrt
 import numpy as np
 mp_drawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles
@@ -8,22 +8,28 @@ mp_hands = mp.solutions.hands
 mp_face_mesh = mp.solutions.face_mesh
 
 
-def findDistance(a, b):
-    return m.sqrt((a-b)**2)
+def sqrt_3d(a, b):
+    return sqrt(
+        (a.x-b.x)**2 +
+        (a.y-b.y)**2 +
+        (a.z-b.z)**2)
 
 
-def passDistance(a):
-    lear_x = findDistance(a[0], l_pixelCoordinatesLandmark[0])
-    rear_x = findDistance(a[0], r_pixelCoordinatesLandmark[0])
-    lear_y = findDistance(a[1], l_pixelCoordinatesLandmark[1])
-    rear_y = findDistance(a[1], r_pixelCoordinatesLandmark[1])
-    dis_x = min(lear_x, rear_x)
-    dis_y = min(lear_y, rear_y)
-    print('lear: %f, rear: %f' % (lear_x, rear_x))
-    print('Distance_y = ', dis_y)
-    if dis_x in range(0, 150) and dis_y in range(0, 50):
-        cv2.putText(image, 'warning', (1020, 40),
-                    cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 1, cv2.LINE_AA)
+def passDistance(hand, l, r):
+    dis_l = sqrt_3d(hand, l)
+    dis_r = sqrt_3d(hand, r)
+    dis = min(dis_l, dis_r)
+    print(f'lear: {dis_l:0.3f}, rear: {dis_r:0.3f}')
+    print(f'Distance = {dis:0.3f}')
+    if r.x < hand.x > l.x:
+        print("The Hand is on the Left")
+    elif r.x > hand.x < l.x:
+        print("The Hand is on the Right")
+    else:
+        print("The Hand is on the center")
+    # if dis_x in range(0, 150) and dis_y in range(0, 50):
+    #     cv2.putText(image, 'warning', (1020, 40),
+    #                 cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 1, cv2.LINE_AA)
 
 
 drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
@@ -65,13 +71,10 @@ with mp_hands.Hands(
                     mp_drawing_styles.get_default_hand_connections_style())
 
                 if hand_landmarks.landmark[9]:
-                    h_normalizedLandmark = hand_landmarks.landmark[9]
-                    h_pixelCoordinatesLandmark = mp_drawing._normalized_to_pixel_coordinates(
-                        h_normalizedLandmark.x, h_normalizedLandmark.y, imageWidth, imageHeight)
-
-                    print('Hand')
-                    print(h_pixelCoordinatesLandmark)
-                    print(h_normalizedLandmark)
+                    hand_coordinates = hand_landmarks.landmark[9]
+        else:
+            print("Cannot find hand")
+            hand_coordinates = None
 
         if face_mesh_results.multi_face_landmarks:
             for face_landmarks in face_mesh_results.multi_face_landmarks:
@@ -82,42 +85,18 @@ with mp_hands.Hands(
                     landmark_drawing_spec=None,
                     connection_drawing_spec=mp_drawing_styles
                     .get_default_face_mesh_tesselation_style())
-                mp_drawing.draw_landmarks(
-                    image=image,
-                    landmark_list=face_landmarks,
-                    connections=mp_face_mesh.FACEMESH_CONTOURS,
-                    landmark_drawing_spec=None,
-                    connection_drawing_spec=mp_drawing_styles
-                    .get_default_face_mesh_contours_style())
-                mp_drawing.draw_landmarks(
-                    image=image,
-                    landmark_list=face_landmarks,
-                    connections=mp_face_mesh.FACEMESH_IRISES,
-                    landmark_drawing_spec=None,
-                    connection_drawing_spec=mp_drawing_styles
-                    .get_default_face_mesh_iris_connections_style())
 
                 if face_landmarks.landmark[454]:
-                    r_normalizedLandmark = face_landmarks.landmark[454]
-                    r_pixelCoordinatesLandmark = mp_drawing._normalized_to_pixel_coordinates(
-                        r_normalizedLandmark.x, r_normalizedLandmark.y, imageWidth, imageHeight)
-
-                    print('r_ear')
-                    print(r_pixelCoordinatesLandmark)
-                    print(r_normalizedLandmark)
-
+                    l_ear_coordinates = face_landmarks.landmark[454]
+                
                 if face_landmarks.landmark[234]:
-                    l_normalizedLandmark = face_landmarks.landmark[234]
-                    l_pixelCoordinatesLandmark = mp_drawing._normalized_to_pixel_coordinates(
-                        l_normalizedLandmark.x, l_normalizedLandmark.y, imageWidth, imageHeight)
-
-                    print('l_ear')
-                    print(l_pixelCoordinatesLandmark)
-                    print(l_normalizedLandmark)
-        try:
-            passDistance(h_pixelCoordinatesLandmark)
-        except:
-            continue
+                    r_ear_coordinates = face_landmarks.landmark[234]
+                    
+                if hand_coordinates:
+                    passDistance(hand_coordinates, l_ear_coordinates, r_ear_coordinates)
+        else:
+            print("Cannot find face")
+            
         # Flip the image horizontally for a selfie-view display.
         cv2.imshow('MediaPipe Hands', image)
         if cv2.waitKey(5) & 0xFF == 27:

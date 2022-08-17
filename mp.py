@@ -19,7 +19,7 @@ class MP():
         self.face_detection = mp_face_detection.FaceDetection(min_detection_confidence=0.5)
     
     def __call__(self, image):
-        image_origin = image
+        image_origin = image.copy()
         image.flags.writeable = False
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         pose_results = self.pose.process(image)
@@ -33,8 +33,9 @@ class MP():
         image = eye(image, face_mesh_results)
         image = emotion(image, face_detection_results)
         
-        if self.__sharpness(image_origin) < 12:
+        if self.__sharpness(image_origin) < 15:
             cv2.putText(image, "Covered!", (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0 ,255, 255), 1, cv2.LINE_AA) 
+       
         # pose
         mp_drawing.draw_landmarks(image,pose_results.pose_landmarks,mp_pose.POSE_CONNECTIONS,landmark_drawing_spec=mp_drawing_styles.get_default_pose_landmarks_style())
         
@@ -82,11 +83,11 @@ class MP():
         return stddev[0,0]
 
     
-# v=cv2.VideoCapture(0)
-# ll = MP()
-# while True:
-#     ret, frame= v.read()
-#     frame = ll(frame)
-#     cv2.imshow('frame', frame)
-#     cv2.waitKey(2)
-# cv2.destroyAllWindows()
+v=cv2.VideoCapture(0)
+ll = MP()
+while True:
+    ret, frame= v.read()
+    frame = ll(frame)
+    cv2.imshow('frame', frame)
+    cv2.waitKey(2)
+cv2.destroyAllWindows()
