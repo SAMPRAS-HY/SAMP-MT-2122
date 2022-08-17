@@ -263,3 +263,28 @@ class Timer(Times):
         dic['total_time_s'] = round(total_time, 4)
         return dic
 
+
+def get_current_memory_mb():
+    """
+    It is used to Obtain the memory usage of the CPU and GPU during the running of the program.
+    And this function Current program is time-consuming.
+    """
+    import pynvml
+    import psutil
+    import GPUtil
+    gpu_id = int(os.environ.get('CUDA_VISIBLE_DEVICES', 0))
+
+    pid = os.getpid()
+    p = psutil.Process(pid)
+    info = p.memory_full_info()
+    cpu_mem = info.uss / 1024. / 1024.
+    gpu_mem = 0
+    gpu_percent = 0
+    gpus = GPUtil.getGPUs()
+    if gpu_id is not None and len(gpus) > 0:
+        gpu_percent = gpus[gpu_id].load
+        pynvml.nvmlInit()
+        handle = pynvml.nvmlDeviceGetHandleByIndex(0)
+        meminfo = pynvml.nvmlDeviceGetMemoryInfo(handle)
+        gpu_mem = meminfo.used / 1024. / 1024.
+    return round(cpu_mem, 4), round(gpu_mem, 4), round(gpu_percent, 4)
