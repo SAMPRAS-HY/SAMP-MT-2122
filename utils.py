@@ -62,7 +62,7 @@ def argsparser():
     parser.add_argument(
         "--device",
         type=str,
-        default='cpu',
+        default='gpu',
         help="Choose the device you want to run, it can be: CPU/GPU/XPU, default is CPU."
     )
     parser.add_argument(
