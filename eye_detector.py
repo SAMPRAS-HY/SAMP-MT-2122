@@ -1,7 +1,8 @@
 import cv2 as cv
 import math
 import eye_utils as utils
-
+import threading
+from playsound import playsound
 # Left eyes indices 
 LEFT_EYE =[ 362, 382, 381, 380, 374, 373, 390, 249, 263, 466, 388, 387, 386, 385,384, 398 ]
 
@@ -68,6 +69,8 @@ class Eye_Close_Detector():
             if ratio >= 4.5:
                 self.COUNTER += 1
                 utils.colorBackgroundText(frame,  'Eye closed', FONTS, 1.7, (int(frame_height/2), 100), 2, utils.YELLOW, pad_x=6, pad_y=6, )
+                if self.COUNTER > 10:
+                    threading.Thread(target=playsound,args=("alarm.wav",),daemon=True).start()
                 print("Counter=",self.COUNTER)
             else:
                 self.COUNTER=0
