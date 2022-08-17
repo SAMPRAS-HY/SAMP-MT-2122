@@ -82,11 +82,11 @@ class MP():
         return stddev[0,0]
 
     
-v=cv2.VideoCapture(0)
-ll = MP()
-while True:
-    ret, frame= v.read()
-    frame = ll(frame)
-    cv2.imshow('frame', frame)
-    cv2.waitKey(2)
-cv2.destroyAllWindows()
+# v=cv2.VideoCapture(0)
+# ll = MP()
+# while True:
+#     ret, frame= v.read()
+#     frame = ll(frame)
+#     cv2.imshow('frame', frame)
+#     cv2.waitKey(2)
+# cv2.destroyAllWindows()
