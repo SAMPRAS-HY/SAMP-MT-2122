@@ -1,4 +1,3 @@
-from re import I
 import cv2
 import mediapipe as mp
 from eye_detector import Eye_Close_Detector
