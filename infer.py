@@ -311,6 +311,7 @@ class Detector(object):
             print('detect frame: %d' % (index))
             index += 1
             results = self.predict_image([frame[:, :, ::-1]], visual=False)
+            print(results)
             frame = mp(frame)
             im = visualize_box_mask(
                 frame,

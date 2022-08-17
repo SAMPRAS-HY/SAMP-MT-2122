@@ -1,5 +1,4 @@
 import cv2 as cv
-import mediapipe as mp
 import math
 import eye_utils as utils
 
@@ -48,10 +47,12 @@ def blinkRatio(landmarks, right_indices, left_indices):
     lvDistance = euclaideanDistance(lv_top, lv_bottom)
     lhDistance = euclaideanDistance(lh_right, lh_left)
 
-    reRatio = rhDistance/(rvDistance if rvDistance!=0 else 0.1)
-    leRatio = lhDistance/(lvDistance if lvDistance!=0 else 0.1)
-
-    ratio = (reRatio+leRatio)/2
+    reRatio = rvDistance/rhDistance
+    leRatio = lvDistance/lhDistance
+    try:
+        ratio = (1/reRatio+1/leRatio)/2
+    except ZeroDivisionError:
+        ratio = 5
     return ratio 
 
 class Eye_Close_Detector():
@@ -64,7 +65,7 @@ class Eye_Close_Detector():
             mesh_coords = landmarksDetection(frame,results)
             ratio = blinkRatio(mesh_coords, RIGHT_EYE, LEFT_EYE)
             utils.colorBackgroundText(frame,  f'Ratio : {round(ratio,2)}', FONTS, 0.7, (30,100),2, utils.PINK, utils.YELLOW)
-            if ratio >= 3.8:
+            if ratio >= 4.5:
                 self.COUNTER += 1
                 utils.colorBackgroundText(frame,  'Eye closed', FONTS, 1.7, (int(frame_height/2), 100), 2, utils.YELLOW, pad_x=6, pad_y=6, )
                 print("Counter=",self.COUNTER)

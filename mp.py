@@ -34,22 +34,22 @@ class MP():
         image = eye(image, face_mesh_results)
         #image = emotion(image, face_detection_results)
         image = hand_mesh(hands_results, face_mesh_results, image)
-        # if self.__sharpness(image_origin) < 15:
-        #     cv2.putText(image, "Covered!", (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0 ,255, 255), 1, cv2.LINE_AA) 
+        if self.__sharpness(image_origin) < 15:
+            cv2.putText(image, "Covered!", (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0 ,255, 255), 1, cv2.LINE_AA) 
        
         # pose
         # mp_drawing.draw_landmarks(image,pose_results.pose_landmarks,mp_pose.POSE_CONNECTIONS,landmark_drawing_spec=mp_drawing_styles.get_default_pose_landmarks_style())
         
         # face mesh
-        # if face_mesh_results.multi_face_landmarks:
-        #     for face_landmarks in face_mesh_results.multi_face_landmarks:
-        #         mp_drawing.draw_landmarks(
-        #             image=image,
-        #             landmark_list=face_landmarks,
-        #             connections=mp_face_mesh.FACEMESH_TESSELATION,
-        #             landmark_drawing_spec=None,
-        #             connection_drawing_spec=mp_drawing_styles
-        #             .get_default_face_mesh_tesselation_style())
+        if face_mesh_results.multi_face_landmarks:
+            for face_landmarks in face_mesh_results.multi_face_landmarks:
+                mp_drawing.draw_landmarks(
+                    image=image,
+                    landmark_list=face_landmarks,
+                    connections=mp_face_mesh.FACEMESH_TESSELATION,
+                    landmark_drawing_spec=None,
+                    connection_drawing_spec=mp_drawing_styles
+                    .get_default_face_mesh_tesselation_style())
         #         mp_drawing.draw_landmarks(
         #             image=image,
         #             landmark_list=face_landmarks,
@@ -65,15 +65,15 @@ class MP():
         #             connection_drawing_spec=mp_drawing_styles
         #             .get_default_face_mesh_iris_connections_style())
 
-        # # hands
-        # if hands_results.multi_hand_landmarks:
-        #     for hand_landmarks in hands_results.multi_hand_landmarks:
-        #         mp_drawing.draw_landmarks(
-        #             image,
-        #             hand_landmarks,
-        #             mp_hands.HAND_CONNECTIONS,
-        #             mp_drawing_styles.get_default_hand_landmarks_style(),
-        #             mp_drawing_styles.get_default_hand_connections_style())
+        # hands
+        if hands_results.multi_hand_landmarks:
+            for hand_landmarks in hands_results.multi_hand_landmarks:
+                mp_drawing.draw_landmarks(
+                    image,
+                    hand_landmarks,
+                    mp_hands.HAND_CONNECTIONS,
+                    mp_drawing_styles.get_default_hand_landmarks_style(),
+                    mp_drawing_styles.get_default_hand_connections_style())
         return image
     
     # check the camera is covered
@@ -91,4 +91,3 @@ while True:
     frame = ll(frame)
     cv2.imshow('frame', frame)
     cv2.waitKey(2)
-cv2.destroyAllWindows()

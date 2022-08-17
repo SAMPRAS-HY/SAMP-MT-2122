@@ -21,7 +21,7 @@ def passDistance(hand, l, r, image):
         print("The Hand is on the center")
         return image
         
-    if dis in range(12, 19):
+    if dis in range(10, 21):
         cv2.putText(image, 'warning', (1020, 40),
                     cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 1, cv2.LINE_AA)
     return image
