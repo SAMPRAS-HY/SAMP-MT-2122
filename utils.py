@@ -23,7 +23,7 @@ def argsparser():
     parser.add_argument(
         "--model_dir",
         type=str,
-        default="yolov3_mobilenet_v3",
+        default="yolov3_mobilenet_v3_large_270e_voc",
         help=("Directory include:'model.pdiparams', 'model.pdmodel', "
               "'infer_cfg.yml', created by tools/export_model.py."),
         required=False)
