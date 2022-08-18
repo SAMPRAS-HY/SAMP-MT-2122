@@ -47,12 +47,11 @@ def head_pose(image, face_mesh_results):
 
                 # Get angles
             angles, mtxR, mtxQ, Qx, Qy, Qz = cv2.RQDecomp3x3(rmat)
-
-                # Get the y rotation degree
-            x = angles[0] * 360
-            y = angles[1] * 360
-            z = angles[2] * 360
             
+                # Get the y rotation degree
+            x = angles[0] * 360 
+            y = angles[1] * 360 
+            z = angles[2] * 360
 
                 # See where the user's head tilting
             if y < -5:
@@ -77,8 +76,8 @@ def head_pose(image, face_mesh_results):
             utils.colorBackgroundText(image,  text, FONTS, 1.7, (20, 50), 2, utils.PINK, pad_x=6, pad_y=6, )
                 # Add the text on the image
             # cv2.putText(image, text, (20, 50), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2)
-            # cv2.putText(image, "x: " + str(np.round(x,2)), (500, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-            # cv2.putText(image, "y: " + str(np.round(y,2)), (500, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-            # cv2.putText(image, "z: " + str(np.round(z,2)), (500, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+            cv2.putText(image, "x: " + str(np.round(x,2)), (500, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+            cv2.putText(image, "y: " + str(np.round(y,2)), (500, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+            cv2.putText(image, "z: " + str(np.round(z,2)), (500, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
            
     return image
