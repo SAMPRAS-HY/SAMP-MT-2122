@@ -1,125 +1,54 @@
 import cv2
-import mediapipe as mp
-import math as m
-import numpy as np
-mp_drawing = mp.solutions.drawing_utils
-mp_drawing_styles = mp.solutions.drawing_styles
-mp_hands = mp.solutions.hands
-mp_face_mesh = mp.solutions.face_mesh
+from math import sqrt
+import threading
+from playsound import playsound
+import eye_utils as utils
+FONTS =cv2.FONT_HERSHEY_COMPLEX
 
+class Hand_Mesh():
+    def __init__(self):
+        self.COUNTER = 0
+        
+    def sqrt_3d(self, a, b):
+        return sqrt(
+            (a.x-b.x)**2 +
+            (a.y-b.y)**2 +
+            (a.z-b.z)**2)
 
-def findDistance(a, b):
-    return m.sqrt((a-b)**2)
+    def passDistance(self, hand, l, r, image):
+        dis_l = self.sqrt_3d(hand, l)
+        dis_r = self.sqrt_3d(hand, r)
+        dis = int(min(dis_l, dis_r)*100)
+        print(f'lear: {dis_l:0.3f}, rear: {dis_r:0.3f}')
+        print(f'Distance = {dis:0.3f}')
+        if r.x < hand.x > l.x:
+            print("The Hand is on the Left")
+        elif r.x > hand.x < l.x:
+            print("The Hand is on the Right")
+        else:
+            print("The Hand is on the center")
+            return image
+            
+        if dis in range(10, 21):
+            self.COUNTER += 1
+            utils.colorBackgroundText(image,  'warning', FONTS, 1.7, (1020, 40), 2, utils.ORANGE, pad_x=6, pad_y=6, )
+            if self.COUNTER > 10:
+                threading.Thread(target=playsound,args=("alarm.wav",),daemon=True).start()
+            # cv2.putText(image, 'warning', (1020, 40),
+            #             cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 1, cv2.LINE_AA)
+        else:
+            self.COUNTER = 0
+        return image
 
-
-def passDistance(a):
-    lear_x = findDistance(a[0], l_pixelCoordinatesLandmark[0])
-    rear_x = findDistance(a[0], r_pixelCoordinatesLandmark[0])
-    lear_y = findDistance(a[1], l_pixelCoordinatesLandmark[1])
-    rear_y = findDistance(a[1], r_pixelCoordinatesLandmark[1])
-    dis_x = min(lear_x, rear_x)
-    dis_y = min(lear_y, rear_y)
-    print('lear: %f, rear: %f' % (lear_x, rear_x))
-    print('Distance_y = ', dis_y)
-    if dis_x in range(0, 150) and dis_y in range(0, 50):
-        cv2.putText(image, 'warning', (1020, 40),
-                    cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 1, cv2.LINE_AA)
-
-
-drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
-cap = cv2.VideoCapture(0)
-
-with mp_hands.Hands(
-        model_complexity=0,
-        min_detection_confidence=0.5,
-        min_tracking_confidence=0.5) as hands, mp_face_mesh.FaceMesh(
-        max_num_faces=1,
-        refine_landmarks=True,
-        min_detection_confidence=0.5,
-        min_tracking_confidence=0.5) as face_mesh:
-    while cap.isOpened():
-        success, image = cap.read()
-        if not success:
-            print("Ignoring empty camera frame.")
-            # If loading a video, use 'break' instead of 'continue'.
-            continue
-
-        # To improve performance, optionally mark the image as not writeable to
-        # pass by reference.
-        image.flags.writeable = False
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        hands_results = hands.process(image)
-        face_mesh_results = face_mesh.process(image)
-
-        # Draw the hand annotations on the image.
-        image.flags.writeable = True
-        image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
-        imageHeight, imageWidth, _ = image.shape
-        if hands_results.multi_hand_landmarks:
-            for hand_landmarks in hands_results.multi_hand_landmarks:
-                mp_drawing.draw_landmarks(
-                    image,
-                    hand_landmarks,
-                    mp_hands.HAND_CONNECTIONS,
-                    mp_drawing_styles.get_default_hand_landmarks_style(),
-                    mp_drawing_styles.get_default_hand_connections_style())
-
-                if hand_landmarks.landmark[9]:
-                    h_normalizedLandmark = hand_landmarks.landmark[9]
-                    h_pixelCoordinatesLandmark = mp_drawing._normalized_to_pixel_coordinates(
-                        h_normalizedLandmark.x, h_normalizedLandmark.y, imageWidth, imageHeight)
-
-                    print('Hand')
-                    print(h_pixelCoordinatesLandmark)
-                    print(h_normalizedLandmark)
-
-        if face_mesh_results.multi_face_landmarks:
-            for face_landmarks in face_mesh_results.multi_face_landmarks:
-                mp_drawing.draw_landmarks(
-                    image=image,
-                    landmark_list=face_landmarks,
-                    connections=mp_face_mesh.FACEMESH_TESSELATION,
-                    landmark_drawing_spec=None,
-                    connection_drawing_spec=mp_drawing_styles
-                    .get_default_face_mesh_tesselation_style())
-                mp_drawing.draw_landmarks(
-                    image=image,
-                    landmark_list=face_landmarks,
-                    connections=mp_face_mesh.FACEMESH_CONTOURS,
-                    landmark_drawing_spec=None,
-                    connection_drawing_spec=mp_drawing_styles
-                    .get_default_face_mesh_contours_style())
-                mp_drawing.draw_landmarks(
-                    image=image,
-                    landmark_list=face_landmarks,
-                    connections=mp_face_mesh.FACEMESH_IRISES,
-                    landmark_drawing_spec=None,
-                    connection_drawing_spec=mp_drawing_styles
-                    .get_default_face_mesh_iris_connections_style())
-
-                if face_landmarks.landmark[454]:
-                    r_normalizedLandmark = face_landmarks.landmark[454]
-                    r_pixelCoordinatesLandmark = mp_drawing._normalized_to_pixel_coordinates(
-                        r_normalizedLandmark.x, r_normalizedLandmark.y, imageWidth, imageHeight)
-
-                    print('r_ear')
-                    print(r_pixelCoordinatesLandmark)
-                    print(r_normalizedLandmark)
-
-                if face_landmarks.landmark[234]:
-                    l_normalizedLandmark = face_landmarks.landmark[234]
-                    l_pixelCoordinatesLandmark = mp_drawing._normalized_to_pixel_coordinates(
-                        l_normalizedLandmark.x, l_normalizedLandmark.y, imageWidth, imageHeight)
-
-                    print('l_ear')
-                    print(l_pixelCoordinatesLandmark)
-                    print(l_normalizedLandmark)
-        try:
-            passDistance(h_pixelCoordinatesLandmark)
-        except:
-            continue
-        # Flip the image horizontally for a selfie-view display.
-        cv2.imshow('MediaPipe Hands', image)
-        if cv2.waitKey(5) & 0xFF == 27:
-            break
-cap.release()
+    def __call__(self, hands_results, face_mesh_results, image):
+        if hands_results.multi_hand_landmarks and face_mesh_results.multi_face_landmarks:
+            for hand_landmarks, face_landmarks in zip(hands_results.multi_hand_landmarks, face_mesh_results.multi_face_landmarks):
+                if hand_landmarks.landmark[9] and face_landmarks.landmark[454] and face_landmarks.landmark[234]:
+                    hand_coordinates = hand_landmarks.landmark[9]
+                    l_ear_coordinates = face_landmarks.landmark[454]
+                    r_ear_coordinates = face_landmarks.landmark[234]
+                    return self.passDistance(hand_coordinates, l_ear_coordinates, r_ear_coordinates, image) 
+        else:
+            print("Cannot find Hand or Face")  
+            return image
+            
