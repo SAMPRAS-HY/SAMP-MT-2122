@@ -1,5 +1,4 @@
 import cv2
-import numpy as np
 import dlib
 import threading
 from playsound import playsound
@@ -36,24 +35,23 @@ def calculate_lip(lips):
 
      return lar
 
-lip_counter = 0 
-eye_counter = 0
-lip_lar = 0.4
-lip_per_frame = 10
-eye_ar_thresh = 0.3
-eye_ar_consec_frames = 3
-req = False
-req2 = False
-eye_ratio = 1
-lar = 0
 
-detector = cv2.CascadeClassifier("haarcascade_frontalface_default.xml") 
+
+detector = cv2.CascadeClassifier("Yawn/haarcascade_frontalface_default.xml") 
 detector_2 = dlib.get_frontal_face_detector()
-predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
-cap = cv2.VideoCapture(0)
+predictor = dlib.shape_predictor("Yawn/shape_predictor_68_face_landmarks.dat")
 
-while True:
-    _, frame = cap.read()
+def Yawn(frame):
+    lip_counter = 0 
+    eye_counter = 0
+    lip_lar = 0.4
+    lip_per_frame = 10
+    eye_ar_thresh = 0.3
+    eye_ar_consec_frames = 3
+    req = False
+    req2 = False
+    eye_ratio = 1
+    lar = 0
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     faces = detector_2(gray)
     rects = detector.detectMultiScale(gray, scaleFactor=1.1, 
@@ -111,6 +109,4 @@ while True:
     cv2.putText(frame, "EAR: {:.2f}".format(eye_ratio), (300, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
     cv2.putText(frame, "LAR: {:.2f}".format(lar), (300, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2) 
     cv2.imshow("yawn detection", frame)
-    if cv2.waitKey(5) & 0xFF == 27:
-        break
-cap.release()
+    return frame

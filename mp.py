@@ -4,6 +4,7 @@ from eye_detector import Eye_Close_Detector
 from emotion import emotion
 from hand_mesh_2 import Hand_Mesh
 from head_pose import head_pose
+from Yawn.yawn import Yawn
 mp_drawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles
 mp_pose = mp.solutions.pose
@@ -32,10 +33,12 @@ class MP():
         image.flags.writeable = True
         image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
         
-        image = head_pose(image, face_mesh_results)
-        image = eye(image, face_mesh_results)
-        image = emotion(image, face_detection_results)
-        image = hand_mesh(hands_results, face_mesh_results, image)
+        image = Yawn(image)
+        #image = head_pose(image, face_mesh_results)
+        #image = eye(image, face_mesh_results)
+        #image = emotion(image, face_detection_results)
+        #image = hand_mesh(hands_results, face_mesh_results, image)
+        
         # if self.__sharpness(image_origin) < 15:
         #     cv2.putText(image, "Covered!", (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0 ,255, 255), 1, cv2.LINE_AA) 
        
@@ -68,14 +71,14 @@ class MP():
         #             .get_default_face_mesh_iris_connections_style())
 
         # hands
-        if hands_results.multi_hand_landmarks:
-            for hand_landmarks in hands_results.multi_hand_landmarks:
-                mp_drawing.draw_landmarks(
-                    image,
-                    hand_landmarks,
-                    mp_hands.HAND_CONNECTIONS,
-                    mp_drawing_styles.get_default_hand_landmarks_style(),
-                    mp_drawing_styles.get_default_hand_connections_style())
+        # if hands_results.multi_hand_landmarks:
+        #     for hand_landmarks in hands_results.multi_hand_landmarks:
+        #         mp_drawing.draw_landmarks(
+        #             image,
+        #             hand_landmarks,
+        #             mp_hands.HAND_CONNECTIONS,
+        #             mp_drawing_styles.get_default_hand_landmarks_style(),
+        #             mp_drawing_styles.get_default_hand_connections_style())
         return image
     
     # check the camera is covered
