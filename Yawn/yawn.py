@@ -108,5 +108,5 @@ class Yawn():
 
         cv2.putText(frame, "EAR: {:.2f}".format(self.eye_ratio), (300, 300), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
         cv2.putText(frame, "LAR: {:.2f}".format(self.lar), (300, 330), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2) 
-        cv2.imshow("yawn detection", frame)
+        #cv2.imshow("yawn detection", frame)
         return frame
