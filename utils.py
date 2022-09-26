@@ -45,7 +45,7 @@ def argsparser():
     parser.add_argument(
         "--camera_id",
         type=int,
-        default=-1,
+        default=0,
         help="device id of camera to predict.")
     parser.add_argument(
         "--threshold", type=float, default=0.5, help="Threshold of score.")

@@ -2,6 +2,9 @@ import cv2
 import mediapipe as mp
 from eye_detector import Eye_Close_Detector
 from emotion import emotion
+from hand_mesh_2 import Hand_Mesh
+from head_pose import head_pose
+from Yawn.yawn import Yawn
 mp_drawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles
 mp_pose = mp.solutions.pose
@@ -10,7 +13,8 @@ mp_hands = mp.solutions.hands
 mp_face_detection = mp.solutions.face_detection
 drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
 eye = Eye_Close_Detector()
-
+hand_mesh = Hand_Mesh()
+yawn = Yawn()
 class MP():
     def __init__(self):
         self.pose = mp_pose.Pose(min_detection_confidence=0.5,min_tracking_confidence=0.5)
@@ -19,7 +23,7 @@ class MP():
         self.face_detection = mp_face_detection.FaceDetection(min_detection_confidence=0.5)
     
     def __call__(self, image):
-        image_origin = image
+        image_origin = image.copy()
         image.flags.writeable = False
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         pose_results = self.pose.process(image)
@@ -29,14 +33,18 @@ class MP():
         # Draw the pose annotation on the image.
         image.flags.writeable = True
         image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
-
+        
+        image = yawn(image)
+        image = head_pose(image, face_mesh_results)
         image = eye(image, face_mesh_results)
         image = emotion(image, face_detection_results)
+        image = hand_mesh(hands_results, face_mesh_results, image)
         
-        if self.__sharpness(image_origin) < 12:
-            cv2.putText(image, "Covered!", (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0 ,255, 255), 1, cv2.LINE_AA) 
+        # if self.__sharpness(image_origin) < 15:
+        #     cv2.putText(image, "Covered!", (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0 ,255, 255), 1, cv2.LINE_AA) 
+       
         # pose
-        mp_drawing.draw_landmarks(image,pose_results.pose_landmarks,mp_pose.POSE_CONNECTIONS,landmark_drawing_spec=mp_drawing_styles.get_default_pose_landmarks_style())
+        # mp_drawing.draw_landmarks(image,pose_results.pose_landmarks,mp_pose.POSE_CONNECTIONS,landmark_drawing_spec=mp_drawing_styles.get_default_pose_landmarks_style())
         
         # face mesh
         if face_mesh_results.multi_face_landmarks:
@@ -48,20 +56,20 @@ class MP():
                     landmark_drawing_spec=None,
                     connection_drawing_spec=mp_drawing_styles
                     .get_default_face_mesh_tesselation_style())
-                mp_drawing.draw_landmarks(
-                    image=image,
-                    landmark_list=face_landmarks,
-                    connections=mp_face_mesh.FACEMESH_CONTOURS,
-                    landmark_drawing_spec=None,
-                    connection_drawing_spec=mp_drawing_styles
-                    .get_default_face_mesh_contours_style())
-                mp_drawing.draw_landmarks(
-                    image=image,
-                    landmark_list=face_landmarks,
-                    connections=mp_face_mesh.FACEMESH_IRISES,
-                    landmark_drawing_spec=None,
-                    connection_drawing_spec=mp_drawing_styles
-                    .get_default_face_mesh_iris_connections_style())
+        #         mp_drawing.draw_landmarks(
+        #             image=image,
+        #             landmark_list=face_landmarks,
+        #             connections=mp_face_mesh.FACEMESH_CONTOURS,
+        #             landmark_drawing_spec=None,
+        #             connection_drawing_spec=mp_drawing_styles
+        #             .get_default_face_mesh_contours_style())
+        #         mp_drawing.draw_landmarks(
+        #             image=image,
+        #             landmark_list=face_landmarks,
+        #             connections=mp_face_mesh.FACEMESH_IRISES,
+        #             landmark_drawing_spec=None,
+        #             connection_drawing_spec=mp_drawing_styles
+        #             .get_default_face_mesh_iris_connections_style())
 
         # hands
         if hands_results.multi_hand_landmarks:
@@ -82,11 +90,10 @@ class MP():
         return stddev[0,0]
 
     
-# v=cv2.VideoCapture(0)
-# ll = MP()
-# while True:
-#     ret, frame= v.read()
-#     frame = ll(frame)
-#     cv2.imshow('frame', frame)
-#     cv2.waitKey(2)
-# cv2.destroyAllWindows()
+v=cv2.VideoCapture(0)
+ll = MP()
+while True:
+    ret, frame= v.read()
+    frame = ll(frame)
+    cv2.imshow('frame', frame)
+    cv2.waitKey(2)
